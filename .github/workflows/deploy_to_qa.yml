@@ -40,4 +40,4 @@ jobs:
           run: docker push $IMAGE_NAME
 
         - name: Deploy Docker image
-          run: gcloud run deploy $SERVICE_NAME --project ${{ secrets.GCP_QA_PROJECT_ID }} --memory 2G --min-instances 1 --image $IMAGE_NAME --region us-west1 --allow-unauthenticated --source example \ --set-env-vars CLOUD_RUN_PROJECT_HASH=${{ secrets.CLOUD_RUN_PROJECT_HASH }} --platform managed
+          run: gcloud run deploy $SERVICE_NAME --project ${{ secrets.GCP_QA_PROJECT_ID }} --memory 2G --min-instances 1 --image $IMAGE_NAME --region us-west1 --allow-unauthenticated --set-env-vars CLOUD_RUN_PROJECT_HASH=${{ secrets.CLOUD_RUN_PROJECT_HASH }} --platform managed
