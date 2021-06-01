@@ -8,7 +8,7 @@ env:
   SERVICE_NAME: ${{ github.event.repository.name }}
   RUN_REGION: us-west1-c
   COMMIT_SHA: ${{ github.sha }}
-  PORT: 8080
+  PORT: 8888
 
 jobs:
 
