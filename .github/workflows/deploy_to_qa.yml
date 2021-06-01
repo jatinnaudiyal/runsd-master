@@ -1,0 +1,43 @@
+name: Deploy to QA
+
+on:
+  push:
+    branches: [ master ]
+
+env:
+  SERVICE_NAME: ${{ github.event.repository.name }}
+  RUN_REGION: us-west1-c
+  COMMIT_SHA: ${{ github.sha }}
+  PORT: 8080
+
+jobs:
+
+    deploy:
+
+        name: Setup Gcloud Account
+        runs-on: ubuntu-latest
+        env:
+          IMAGE_NAME: gcr.io/${{ secrets.GCP_QA_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}
+        steps:
+
+        - name: Login
+          uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+          with:
+            GCP_PROJECT_ID: ${{ secrets.GCP_QA_PROJECT_ID }}
+            service_account_email: ${{ secrets.GCP_QA_EMAIL }}
+            service_account_key: ${{ secrets.GCP_QA_CREDENTIALS }}
+
+        - name: Configure Docker
+          run: gcloud auth configure-docker --quiet
+
+        - name: Checkout repository
+          uses: actions/checkout@v2
+
+        - name: Build Docker image
+          run: docker build . -t $IMAGE_NAME
+
+        - name: Push Docker image
+          run: docker push $IMAGE_NAME
+
+        - name: Deploy Docker image
+          run: gcloud run deploy $SERVICE_NAME --project ${{ secrets.GCP_QA_PROJECT_ID }} --memory 2G --min-instances 1 --image $IMAGE_NAME --region us-west1 --allow-unauthenticated --source=example \ --set-env-vars=CLOUD_RUN_PROJECT_HASH=2tgsrot4ua --platform managed
